@@ -20,25 +20,24 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-func getEnv(key, defaultValue string) string {
-	if value := os.Getenv(key); value != "" {
-		return value
+func getEnvRequired(key string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		log.Fatalf("❌ Required environment variable %s is not set", key)
 	}
-	return defaultValue
+	return value
 }
 
 func main() {
 	log.Println("🚀 Starting Documents gRPC Service...")
 
-	// Configuración desde variables de entorno
-	grpcPort := getEnv("GRPC_PORT", "8888")
-	dbHost := getEnv("DB_HOST", "localhost")
-	dbPort := getEnv("DB_PORT", "5432")
-	dbUser := getEnv("DB_USER", "postgres")
-	dbPass := getEnv("DB_PASSWORD", "postgres")
-	dbName := getEnv("DB_NAME", "documents_db")
+	grpcPort := getEnvRequired("GRPC_PORT")
+	dbHost := getEnvRequired("DB_HOST")
+	dbPort := getEnvRequired("DB_PORT")
+	dbUser := getEnvRequired("DB_USER")
+	dbPass := getEnvRequired("DB_PASSWORD")
+	dbName := getEnvRequired("DB_NAME")
 
-	// Conectar a PostgreSQL
 	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
 		dbHost, dbPort, dbUser, dbPass, dbName)
 
@@ -48,7 +47,6 @@ func main() {
 	}
 	defer db.Close()
 
-	// Verificar conexión
 	if err := db.Ping(); err != nil {
 		log.Fatalf("❌ Failed to ping database: %v", err)
 	}
@@ -61,15 +59,11 @@ func main() {
 	}
 	log.Println("✅ Database schema initialized")
 
-	// Seed data (opcional)
 	if err := repo.SeedData(ctx); err != nil {
 		log.Printf("⚠️  Failed to seed data: %v", err)
 	}
-
-	// Inicializar servicio
 	docService := services.NewDocumentService(repo)
 
-	// Crear servidor gRPC
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", grpcPort))
 	if err != nil {
 		log.Fatalf("❌ Failed to listen: %v", err)
