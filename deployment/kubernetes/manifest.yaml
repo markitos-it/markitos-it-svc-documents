@@ -4,7 +4,7 @@ metadata:
   name: markitos-it-svc-documents-deployment
   namespace: default
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: markitos-it-svc-documents-pods
@@ -17,7 +17,7 @@ spec:
       - name: gcp-artifact-registry-secret
       containers:
       - name: markitos-it-svc-documents-container
-        image: europe-southwest1-docker.pkg.dev/markitos-it-images/private/markitos-it-svc-documents:1.4.0
+        image: europe-southwest1-docker.pkg.dev/markitos-it-images/private/markitos-it-svc-documents:1.0.0
         ports:
         - containerPort: 8888
         readinessProbe:

@@ -8,7 +8,7 @@ if [ -z "$1" ]; then
 fi
 
 VERSION=$1
-TAG="v${VERSION}"
+TAG="${VERSION}"
 
 echo "🏷️  Creating and pushing tag: ${TAG}"
 
