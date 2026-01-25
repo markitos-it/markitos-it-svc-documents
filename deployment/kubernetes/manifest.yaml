@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: markitos-it-svc-documents-deployment
+  namespace: default
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: markitos-it-svc-documents-pods
+  template:
+    metadata:
+      labels:
+        app: markitos-it-svc-documents-pods
+    spec:
+      imagePullSecrets:
+      - name: gcp-artifact-registry-secret
+      containers:
+      - name: markitos-it-svc-documents-container
+        image: europe-southwest1-docker.pkg.dev/markitos-it-images/private/markitos-it-svc-documents:1.4.0
+        ports:
+        - containerPort: 8888
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8888
+          initialDelaySeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: markitos-it-svc-documents-service
+  namespace: default
+spec:
+  type: ClusterIP
+  selector:
+    app:  markitos-it-svc-documents-pods
+  ports:
+  - port: 8888
+    targetPort: 8888

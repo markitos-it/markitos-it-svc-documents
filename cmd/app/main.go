@@ -20,17 +20,23 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-const (
-	grpcPort = "8888"
-	dbHost   = "localhost"
-	dbPort   = "5432"
-	dbUser   = "postgres"
-	dbPass   = "postgres"
-	dbName   = "documents_db"
-)
+func getEnv(key, defaultValue string) string {
+	if value := os.Getenv(key); value != "" {
+		return value
+	}
+	return defaultValue
+}
 
 func main() {
 	log.Println("🚀 Starting Documents gRPC Service...")
+
+	// Configuración desde variables de entorno
+	grpcPort := getEnv("GRPC_PORT", "8888")
+	dbHost := getEnv("DB_HOST", "localhost")
+	dbPort := getEnv("DB_PORT", "5432")
+	dbUser := getEnv("DB_USER", "postgres")
+	dbPass := getEnv("DB_PASSWORD", "postgres")
+	dbName := getEnv("DB_NAME", "documents_db")
 
 	// Conectar a PostgreSQL
 	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
