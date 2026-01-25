@@ -1,0 +1,54 @@
+# Binaries
+bin/markitos-svc-documents
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Go workspace file
+go.work
+
+# Dependency directories
+vendor/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+
+# Logs
+*.log
+
+# Database
+*.db
+*.sqlite
+
+# Protobuf generated files (keep in repo for easy builds)
+# proto/*.pb.go
+
+# Build artifacts
+dist/
+build/
+
+# Keys
+nogit/
+*.key
+*.pem
+*.json
+!deployment/**/*.json
