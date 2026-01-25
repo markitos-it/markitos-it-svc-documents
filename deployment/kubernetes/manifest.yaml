@@ -20,11 +20,48 @@ spec:
         image: europe-southwest1-docker.pkg.dev/markitos-it-images/private/markitos-it-svc-documents:1.0.0
         ports:
         - containerPort: 8888
+          name: grpc
+        env:
+        - name: GRPC_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: documents-config
+              key: GRPC_PORT
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: documents-config
+              key: DB_HOST
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: documents-config
+              key: DB_PORT
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: documents-config
+              key: DB_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: DB_PASSWORD
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: documents-config
+              key: DB_NAME
         readinessProbe:
-          httpGet:
-            path: /
+          tcpSocket:
             port: 8888
-          initialDelaySeconds: 5
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          tcpSocket:
+            port: 8888
+          initialDelaySeconds: 15
+          periodSeconds: 10
 ---
 apiVersion: v1
 kind: Service
@@ -34,7 +71,65 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-    app:  markitos-it-svc-documents-pods
+    app: markitos-it-svc-documents-pods
   ports:
   - port: 8888
     targetPort: 8888
+    protocol: TCP
+    name: grpc
+    appProtocol: kubernetes.io/h2c
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: GRPCRoute
+metadata:
+  name: markitos-it-svc-documents-grpcroute
+  namespace: default
+spec:
+  parentRefs:
+  - name: home-gateway
+    namespace: nginx-gateway
+  hostnames:
+  - "grpc.markitos.local"
+  rules:
+  - backendRefs:
+    - name: markitos-it-svc-documents-service
+      port: 8888
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: markitos-it-svc-documents-hpa
+  namespace: default
+spec:
+  minReplicas: 1
+  maxReplicas: 3
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: markitos-it-svc-documents-deployment
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        averageUtilization: 50
+        type: Utilization
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        averageUtilization: 50
+        type: Utilization
+---
+# ConfigMap para configuración completa
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: documents-config
+  namespace: default
+data:
+  GRPC_PORT: "8888"
+  DB_HOST: "postgres"
+  DB_PORT: "5432"
+  DB_USER: "documents_user"
+  DB_NAME: "documents_db"
