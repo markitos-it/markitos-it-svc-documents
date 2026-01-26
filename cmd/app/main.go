@@ -30,40 +30,20 @@ func getEnvRequired(key string) string {
 
 func main() {
 	log.Println("🚀 Starting Documents gRPC Service...")
-
-	grpcPort := getEnvRequired("GRPC_PORT")
-	dbHost := getEnvRequired("DB_HOST")
-	dbPort := getEnvRequired("DB_PORT")
-	dbUser := getEnvRequired("DB_USER")
-	dbPass := getEnvRequired("DB_PASSWORD")
-	dbName := getEnvRequired("DB_NAME")
-
-	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		dbHost, dbPort, dbUser, dbPass, dbName)
-
-	db, err := sql.Open("postgres", dsn)
-	if err != nil {
-		log.Fatalf("❌ Failed to connect to database: %v", err)
-	}
+	db, repo := loadDatabase()
 	defer db.Close()
 
-	if err := db.Ping(); err != nil {
-		log.Fatalf("❌ Failed to ping database: %v", err)
-	}
-	log.Println("✅ Connected to PostgreSQL")
-
-	repo := postgres.NewDocumentRepository(db)
 	ctx := context.Background()
 	if err := repo.InitSchema(ctx); err != nil {
 		log.Fatalf("❌ Failed to initialize schema: %v", err)
 	}
-	log.Println("✅ Database schema initialized")
 
 	if err := repo.SeedData(ctx); err != nil {
 		log.Printf("⚠️  Failed to seed data: %v", err)
 	}
 	docService := services.NewDocumentService(repo)
 
+	grpcPort := getEnvRequired("GRPC_PORT")
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", grpcPort))
 	if err != nil {
 		log.Fatalf("❌ Failed to listen: %v", err)
@@ -71,7 +51,6 @@ func main() {
 
 	grpcServer := grpc.NewServer()
 	pb.RegisterDocumentServiceServer(grpcServer, grpcserver.NewDocumentServer(docService))
-
 	reflection.Register(grpcServer)
 
 	sigChan := make(chan os.Signal, 1)
@@ -88,4 +67,25 @@ func main() {
 	log.Println("\n🛑 Shutting down gracefully...")
 	grpcServer.GracefulStop()
 	log.Println("👋 Service stopped")
+}
+
+func loadDatabase() (*sql.DB, *postgres.DocumentRepository) {
+	log.Println("🚀 loading database")
+	dbHost := getEnvRequired("DB_HOST")
+	dbPort := getEnvRequired("DB_PORT")
+	dbUser := getEnvRequired("DB_USER")
+	dbPass := getEnvRequired("DB_PASSWORD")
+	dbName := getEnvRequired("DB_NAME")
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		dbHost, dbPort, dbUser, dbPass, dbName)
+	db, err := sql.Open("postgres", dsn)
+	if err != nil {
+		log.Fatalf("❌ Failed to connect to database: %v", err)
+	}
+	if err := db.Ping(); err != nil {
+		log.Fatalf("❌ Failed to ping database: %v", err)
+	}
+	log.Println("✅ Connected to PostgreSQL")
+
+	return db, postgres.NewDocumentRepository(db)
 }

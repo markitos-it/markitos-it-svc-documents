@@ -1,21 +1,37 @@
 #!/bin/bash
+
 set -e
 
-if [ -z "$1" ]; then
+cd "$(dirname "$0")/../.."
+
+VERSION=$1
+
+if [ -z "$VERSION" ]; then
     echo "❌ Error: Version is required"
-    echo "Usage: make app-delete-tag 1.2.3"
+    echo "Usage: make app-delete-tag n.n.n"
     exit 1
 fi
 
-VERSION=$1
-TAG="v${VERSION}"
+if ! [[ $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+    echo "❌ Error: Invalid semver format"
+    echo "Version must be in format n.n.n (e.g., 1.2.3)"
+    echo "Only numbers and dots are allowed"
+    exit 1
+fi
 
-echo "🗑️  Deleting tag: ${TAG}"
+TAG="${VERSION}"
 
-# Delete local tag
-git tag -d "${TAG}" 2>/dev/null || echo "Tag ${TAG} not found locally"
+if ! git rev-parse "$TAG" >/dev/null 2>&1; then
+    echo "❌ Error: Tag $TAG does not exist locally"
+    exit 1
+fi
 
-# Delete remote tag
-git push origin --delete "${TAG}" 2>/dev/null || echo "Tag ${TAG} not found remotely"
+echo "🗑️  Deleting git tag: ${TAG}"
 
-echo "✅ Tag ${TAG} deleted"
+git tag -d ${TAG}
+
+echo "📤 Deleting tag from GitHub..."
+
+git push origin :refs/tags/${TAG}
+
+echo "✅ Tag ${TAG} deleted successfully!"

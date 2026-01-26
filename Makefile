@@ -1,19 +1,27 @@
 .DEFAULT_GOAL := help
 
-.PHONY: help app-docker-postgres-start app-docker-postgres-stop proto-gen app-go-start app-go-build app-docker-local-build app-docker-local-start app-docker-local-stop app-clean app-deploy-tag app-delete-tag
+.PHONY: help app-docker-postgres-start app-docker-postgres-stop proto-gen app-go-start app-docker-local-build app-docker-local-start app-docker-local-stop app-clean app-deploy-tag app-delete-tag
 
 help:
-	@echo "📋 Available commands:"
+	@echo "📋 Available commands (LOCAL DEVELOPMENT):"
 	@echo ""
-	@echo "  make app-docker-postgres-start - Start PostgreSQL with Docker Compose"
-	@echo "  make app-docker-postgres-stop  - Stop PostgreSQL"
-	@echo "  make proto-gen                 - Generate protobuf code"
-	@echo "  make app-go-start              - Start app with Go (development)"
-	@echo "  make app-go-build              - Build Go binary to bin/app"
+	@echo "  🚀 DESARROLLO:"
+	@echo "  make app-go-start              - Start app with go run (inicia PostgreSQL)"
+	@echo ""
+	@echo "  🐳 DOCKER LOCAL:"
 	@echo "  make app-docker-local-build    - Build Docker image with :local tag"
-	@echo "  make app-docker-local-start    - Start Docker container locally"
+	@echo "  make app-docker-local-start    - Start Docker container (inicia PostgreSQL)"
 	@echo "  make app-docker-local-stop     - Stop Docker containers (app + PostgreSQL)"
-	@echo "  make app-clean                 - Remove bin/ and Docker :local image"
+	@echo ""
+	@echo "  🗄️  BASE DE DATOS:"
+	@echo "  make app-docker-postgres-start - Start PostgreSQL only"
+	@echo "  make app-docker-postgres-stop  - Stop PostgreSQL only"
+	@echo ""
+	@echo "  🛠️  UTILIDADES:"
+	@echo "  make proto-gen                 - Generate protobuf code"
+	@echo "  make app-clean                 - Remove artifacts and stop PostgreSQL"
+	@echo ""
+	@echo "  ☸️  KUBERNETES (deployment/):"
 	@echo "  make app-deploy-tag <version>  - Create and push git tag (e.g., 1.2.3)"
 	@echo "  make app-delete-tag <version>  - Delete git tag locally and remotely"
 	@echo ""
@@ -29,9 +37,6 @@ proto-gen:
 
 app-go-start:
 	bash bin/app/go-start.sh
-
-app-go-build:
-	bash bin/app/go-build.sh
 
 app-docker-local-build:
 	bash bin/app/docker-local-build.sh

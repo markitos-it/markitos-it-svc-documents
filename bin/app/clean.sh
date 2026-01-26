@@ -3,6 +3,9 @@ set -e
 
 echo "🧹 Cleaning build artifacts..."
 
+# Stop PostgreSQL
+bash bin/app/docker-postgres-stop.sh
+
 # Remove binary
 if [ -f "bin/markitos-svc-documents" ]; then
     rm bin/markitos-svc-documents
