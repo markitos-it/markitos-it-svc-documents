@@ -6,6 +6,7 @@ cd "$(dirname "$0")/../.."
 
 # Start PostgreSQL first
 bash bin/app/docker-postgres-start.sh
+bash bin/app/docker-local-build.sh
 
 # Export variables solo si no están definidas (desarrollo local)
 export GRPC_PORT=${GRPC_PORT:-8888}
@@ -39,6 +40,11 @@ docker run -d \
     --name "${CONTAINER_NAME}" \
     -p ${GRPC_PORT}:${GRPC_PORT} \
     -e DB_HOST=host.docker.internal \
+    -e DB_PORT=${DB_PORT} \
+    -e DB_USER=${DB_USER} \
+    -e DB_PASSWORD=${DB_PASSWORD} \
+    -e DB_NAME=${DB_NAME} \
+    -e GRPC_PORT=${GRPC_PORT} \
     "${IMAGE_NAME}:${TAG}"
 
 echo "✅ Container started: ${CONTAINER_NAME}"
