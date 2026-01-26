@@ -52,3 +52,4 @@ nogit/
 *.pem
 *.json
 !deployment/**/*.json
+main
