@@ -6,12 +6,8 @@ help:
 	@echo "📋 Available commands (LOCAL DEVELOPMENT):"
 	@echo ""
 	@echo "  🚀 DESARROLLO:"
-	@echo "  make app-go-start              - Start app with go run (inicia PostgreSQL)"
-	@echo ""
-	@echo "  🐳 DOCKER LOCAL:"
-	@echo "  make app-docker-local-build    - Build Docker image with :local tag"
-	@echo "  make app-docker-local-start    - Start Docker container (inicia PostgreSQL)"
-	@echo "  make app-docker-local-stop     - Stop Docker containers (app + PostgreSQL)"
+	@echo "  make app-start               	- Start app with go run (inicia PostgreSQL)"
+	@echo "  make app-stop               	- Stop app with go run (para PostgreSQL)"
 	@echo ""
 	@echo "  🗄️  BASE DE DATOS:"
 	@echo "  make app-docker-postgres-start - Start PostgreSQL only"
@@ -35,17 +31,11 @@ app-docker-postgres-stop:
 proto-gen:
 	bash bin/app/proto-gen.sh
 
-app-go-start:
-	bash bin/app/go-start.sh
+app-start:
+	bash bin/app/start.sh
 
-app-docker-local-build:
-	bash bin/app/docker-local-build.sh
-
-app-docker-local-start:
-	bash bin/app/docker-local-start.sh
-
-app-docker-local-stop:
-	bash bin/app/docker-local-stop.sh
+app-stop:
+	bash bin/app/stop.sh
 
 app-clean:
 	bash bin/app/clean.sh

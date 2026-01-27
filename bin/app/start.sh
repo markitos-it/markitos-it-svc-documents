@@ -4,10 +4,8 @@ set -e
 
 cd "$(dirname "$0")/../.."
 
-# Start PostgreSQL silently
 bash bin/app/docker-postgres-start.sh
 
-# Export variables solo si no están definidas (desarrollo local)
 export GRPC_PORT=${GRPC_PORT:-8888}
 export DB_HOST=${DB_HOST:-localhost}
 export DB_PORT=${DB_PORT:-5432}
