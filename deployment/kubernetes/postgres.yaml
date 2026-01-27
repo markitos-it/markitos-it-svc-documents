@@ -1,5 +1,4 @@
 ---
-# ConfigMap para configuración de PostgreSQL
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -10,18 +9,16 @@ data:
   POSTGRES_USER: documents_user
 
 ---
-# Secret para la contraseña de PostgreSQL
 apiVersion: v1
 kind: Secret
 metadata:
   name: postgres-secret
   namespace: default
 type: Opaque
-stringData:
-  DB_PASSWORD: "postgres123"
+data:
+  DB_PASSWORD: "cG9zdGdyZXMxMjM="
 
 ---
-# StatefulSet de PostgreSQL con hostPath
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -66,10 +63,10 @@ spec:
           subPath: postgres
         resources:
           requests:
-            memory: "256Mi"
+            memory: "100Mi"
             cpu: "250m"
           limits:
-            memory: "512Mi"
+            memory: "500Mi"
             cpu: "500m"
         livenessProbe:
           exec:
@@ -94,7 +91,6 @@ spec:
           type: DirectoryOrCreate
 
 ---
-# Service para acceder a PostgreSQL
 apiVersion: v1
 kind: Service
 metadata:
