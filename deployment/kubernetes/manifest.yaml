@@ -122,4 +122,4 @@ data:
   DB_HOST: "postgres"
   DB_PORT: "5432"
   DB_USER: "documents_user"
-  DB_NAME: "documents_db"
+  DB_NAME: "markitos-it-svc-documents"

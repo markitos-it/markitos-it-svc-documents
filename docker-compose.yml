@@ -1,37 +1,37 @@
 services:
-  postgres:
+  markitos-it-svc-documents-postgres:
     image: postgres:17-alpine
-    container_name: markitos-svc-documents-postgres
+    container_name: markitos-it-svc-documents-postgres
     environment:
-      POSTGRES_USER: documents_user
-      POSTGRES_PASSWORD: postgres123
-      POSTGRES_DB: documents_db
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: markitos-it-svc-documents
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - markitos-it-svc-documents-postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U documents_user -d documents_db"]
+      test: [ "CMD-SHELL", "pg_isready -U admin -d markitos-it-svc-documents" ]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  app:
+  markitos-it-svc-documents:
     build: .
-    container_name: markitos-svc-documents-app
+    container_name: markitos-it-svc-documents
     environment:
       GRPC_PORT: "8888"
-      DB_HOST: postgres
+      DB_HOST: markitos-it-svc-documents-postgres
       DB_PORT: "5432"
-      DB_USER: documents_user
-      DB_PASSWORD: postgres123
-      DB_NAME: documents_db
+      DB_USER: admin
+      DB_PASSWORD: admin
+      DB_NAME: markitos-it-svc-documents
     ports:
       - "8888:8888"
     depends_on:
-      postgres:
+      markitos-it-svc-documents-postgres:
         condition: service_healthy
 
 volumes:
-  postgres_data:
+  markitos-it-svc-documents-postgres_data:
     driver: local

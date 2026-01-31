@@ -62,9 +62,9 @@ docker-compose down -v
 Crear la base de datos manualmente:
 
 ```sql
-CREATE DATABASE documents_db;
+CREATE DATABASE markitos-it-svc-documents;
 CREATE USER postgres WITH PASSWORD 'postgres';
-GRANT ALL PRIVILEGES ON DATABASE documents_db TO postgres;
+GRANT ALL PRIVILEGES ON DATABASE markitos-it-svc-documents TO postgres;
 ```
 
 **Opción C: pgAdmin (Interfaz web)**
@@ -88,7 +88,7 @@ dbHost   = "localhost"
 dbPort   = "5432"
 dbUser   = "postgres"
 dbPass   = "postgres"
-dbName   = "documents_db"
+dbName   = "markitos-it-svc-documents"
 ```
 
 ## 📦 Comandos Make
@@ -172,7 +172,7 @@ make app-docker-local-start
 ### Ver logs
 
 ```bash
-docker logs -f markitos-svc-documents-local
+docker logs -f markitos-it-svc-documents-local
 ```
 
 ## 🔌 API gRPC
@@ -259,7 +259,7 @@ Se crean automáticamente al iniciar si la tabla está vacía.
 
 Verificar que PostgreSQL está corriendo:
 ```bash
-psql -U postgres -d documents_db
+psql -U postgres -d markitos-it-svc-documents
 ```
 
 ### Error: "Failed to listen"

@@ -9,9 +9,9 @@ bash bin/app/docker-postgres-start.sh
 export GRPC_PORT=${GRPC_PORT:-8888}
 export DB_HOST=${DB_HOST:-localhost}
 export DB_PORT=${DB_PORT:-5432}
-export DB_USER=${DB_USER:-documents_user}
-export DB_PASSWORD=${DB_PASSWORD:-postgres123}
-export DB_NAME=${DB_NAME:-documents_db}
+export DB_USER=${DB_USER:-admin}
+export DB_PASSWORD=${DB_PASSWORD:-admin}
+export DB_NAME=${DB_NAME:-markitos-it-svc-documents}
 
 echo "🚀 Starting markitos-it-svc-documents (Go)..."
 echo "📡 GRPC_PORT: $GRPC_PORT"

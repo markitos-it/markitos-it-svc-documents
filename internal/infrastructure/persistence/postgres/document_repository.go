@@ -29,7 +29,7 @@ func (r *DocumentRepository) InitSchema(ctx context.Context) error {
 		tags TEXT[],
 		updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 		content_b64 TEXT NOT NULL,
-		cover_image VARCHAR(1000)
+		cover_image VARCHAR(1000) NOT NULL
 	);
 
 	CREATE INDEX IF NOT EXISTS idx_documents_category ON documents(category);

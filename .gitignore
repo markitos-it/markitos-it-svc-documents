@@ -1,5 +1,5 @@
 # Binaries
-bin/markitos-svc-documents
+bin/markitos-it-svc-documents
 *.exe
 *.dll
 *.so
