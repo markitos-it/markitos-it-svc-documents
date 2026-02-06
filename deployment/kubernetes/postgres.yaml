@@ -5,7 +5,7 @@ metadata:
   name: postgres-config
   namespace: default
 data:
-  POSTGRES_DB: documents_db
+  POSTGRES_DB: markitos-it-svc-documents
   POSTGRES_USER: documents_user
 
 ---
@@ -73,7 +73,7 @@ spec:
             command:
             - sh
             - -c
-            - pg_isready -U documents_user -d documents_db
+            - pg_isready -U documents_user -d markitos-it-svc-documents
           initialDelaySeconds: 30
           periodSeconds: 10
         readinessProbe:
@@ -81,7 +81,7 @@ spec:
             command:
             - sh
             - -c
-            - pg_isready -U documents_user -d documents_db
+            - pg_isready -U documents_user -d markitos-it-svc-documents
           initialDelaySeconds: 5
           periodSeconds: 5
       volumes:

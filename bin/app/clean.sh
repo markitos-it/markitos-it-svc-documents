@@ -7,8 +7,8 @@ echo "🧹 Cleaning build artifacts..."
 bash bin/app/docker-postgres-stop.sh
 
 # Remove binary
-if [ -f "bin/markitos-svc-documents" ]; then
-    rm bin/markitos-svc-documents
+if [ -f "bin/markitos-it-svc-documents" ]; then
+    rm bin/markitos-it-svc-documents
     echo "✅ Removed binary"
 fi
 
