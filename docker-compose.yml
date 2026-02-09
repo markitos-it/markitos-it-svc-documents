@@ -6,9 +6,6 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: markitos-it-svc-documents
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
-      POSTGRES_DB: markitos-it-svc-documents
     ports:
       - "5432:5432"
     volumes:
@@ -22,14 +19,10 @@ services:
   markitos-it-svc-documents:
     build: .
     container_name: markitos-it-svc-documents
-    container_name: markitos-it-svc-documents
     environment:
       GRPC_PORT: "8888"
       DB_HOST: markitos-it-svc-documents-postgres
       DB_PORT: "5432"
-      DB_USER: admin
-      DB_PASSWORD: admin
-      DB_NAME: markitos-it-svc-documents
       DB_USER: admin
       DB_PASSWORD: admin
       DB_NAME: markitos-it-svc-documents
