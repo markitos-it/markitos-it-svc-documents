@@ -1,19 +1,18 @@
-name: gitleaks
+name: appsec-pipeline
 on:
   push:
     branches: [main]
   pull_request:
 
 permissions:
-  contents: read # Para que pueda leer el código y el historial
-  security-events: write # Opcional: para que aparezca en la pestaña "Security" de GitHub
+  contents: read
+  security-events: write
 
 jobs:
-  sast-check:
+  # 1. Escaneo de Código Go (SAST)
+  sast-go:
+    name: go-security-check
     runs-on: ubuntu-latest
-    env:
-      GO111MODULE: on
-
     steps:
       - name: Checkout Source
         uses: actions/checkout@v4
@@ -24,20 +23,63 @@ jobs:
       - name: Run Gosec Security Scanner
         uses: securego/gosec@master
         with:
-          args: ./...
+          args: "-severity high -details -fmt sarif -out results.sarif ./..."
+      - name: Upload SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: results.sarif
 
-  scan:
-    name: gitleaks
+  # 2. Escaneo de Secretos (Sin licencia)
+  secrets-scan:
+    name: gitleaks-check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Install Gitleaks
+      - name: Install & Run Gitleaks
         run: |
           VERSION=$(curl -s https://api.github.com/repos/gitleaks/gitleaks/releases/latest | jq -r .tag_name)
-          curl -LO https://github.com/gitleaks/gitleaks/releases/download/${VERSION}/gitleaks_${VERSION:1}_linux_x64.tar.gz
-          tar -xf gitleaks_${VERSION:1}_linux_x64.tar.gz
-          sudo mv gitleaks /usr/local/bin/
-      - name: Run Gitleaks
-        run: gitleaks detect --source=. -v
+          curl -sSL https://github.com/gitleaks/gitleaks/releases/download/${VERSION}/gitleaks_${VERSION:1}_linux_x64.tar.gz | tar -xz
+          ./gitleaks detect --source=. -v --redact
+
+  # 3. Escaneo de Docker y K8s (SCA e Infra-as-Code)
+  infrastructure-security:
+    name: trivy-scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Escanea el Dockerfile y Docker-compose por vulnerabilidades y malas prácticas
+      - name: Scan Docker & IaC
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: "config"
+          hide-progress: false
+          format: "table"
+          exit-code: "1" # Falla el job si encuentra algo crítico
+          severity: "CRITICAL,HIGH"
+
+      # Escanea los archivos de Deployment de Kubernetes
+      - name: K8s Manifest Lint
+        uses: stefanprodan/kube-tools@v1
+        with:
+          kubectl: 1.28.0
+          command: |
+            kubeval --ignore-missing-schemas deployment/*.yaml
+
+  # 4. Análisis de dependencias (SCA)
+  dependency-check:
+    name: go-vulncheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.24.1"
+      - name: Run govulncheck
+        run: |
+          go install golang.org/x/vuln/cmd/govulncheck@latest
+          govulncheck ./...
