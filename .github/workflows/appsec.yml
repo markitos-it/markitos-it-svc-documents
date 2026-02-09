@@ -1,0 +1,43 @@
+name: gitleaks
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read # Para que pueda leer el código y el historial
+  security-events: write # Opcional: para que aparezca en la pestaña "Security" de GitHub
+
+jobs:
+  sast-check:
+    runs-on: ubuntu-latest
+    env:
+      GO111MODULE: on
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.23.1"
+      - name: Run Gosec Security Scanner
+        uses: securego/gosec@master
+        with:
+          args: ./...
+
+  scan:
+    name: gitleaks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install Gitleaks
+        run: |
+          VERSION=$(curl -s https://api.github.com/repos/gitleaks/gitleaks/releases/latest | jq -r .tag_name)
+          curl -LO https://github.com/gitleaks/gitleaks/releases/download/${VERSION}/gitleaks_${VERSION:1}_linux_x64.tar.gz
+          tar -xf gitleaks_${VERSION:1}_linux_x64.tar.gz
+          sudo mv gitleaks /usr/local/bin/
+      - name: Run Gitleaks
+        run: gitleaks detect --source=. -v
