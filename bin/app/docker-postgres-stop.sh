@@ -8,7 +8,7 @@ if ! command -v docker-compose &> /dev/null; then
 fi
 
 # Check if PostgreSQL is running
-if ! docker-compose ps postgres | grep -q "Up"; then
+if ! docker-compose ps markitos-it-svc-documents-postgres | grep -q "Up"; then
     echo "✅ PostgreSQL is already stopped"
     exit 0
 fi
@@ -16,6 +16,6 @@ fi
 echo "🛑 Stopping PostgreSQL..."
 
 # Stop PostgreSQL
-docker-compose down
+docker-compose stop markitos-it-svc-documents-postgres
 
 echo "✅ PostgreSQL stopped"
